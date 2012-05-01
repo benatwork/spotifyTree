@@ -1,14 +1,32 @@
-/* Author:
+/* Author: Ben Roth */
 
-*/
+
+
+
+//_____________ global configs _______________
+var maxBranches = 150;
+var growRate = 10;
+
+
+
+//__________________end global configs _____
 var canvas = document.getElementById('treeCanvas');
 var ctx = canvas.getContext('2d');
 var branches = [];
 
+var angleOffset = toRadians(50);
+
 
 
 function init(){
-	var trunk = new Branch(400,800,100,1,'rgb(0,0,0)');
+	var trunk = new Branch({
+		x: 400,
+		y: 800,
+		rad: 50,
+		generation: 1,
+		color: 'rgb(0,0,0)',
+		angle: toRadians(90)
+	});
 	branches.push(trunk);
 }
 
@@ -16,22 +34,32 @@ function init(){
 function renderLoop(){
 
 	for (var i in branches){
-
 		var b = branches[i];
 		if(b.rad > '.3'){
-
 			drawSection(b.x, b.y, b.rad,b.color);
-			b.x += getRandom(-b.generation,b.generation);
-			b.y -= getRandom(0,2);
-			b.rad *= getRandom(990,994)/1000;
+		
+			b.x += getRandom(-b.generation,b.generation)+Math.cos(b.angle);
+			b.y -= getRandom(-b.generation,b.generation)+ Math.sin(b.angle)//getRandom(0,2)
+			b.rad *= getRandom(994,998)/1000;
+
 			var branchProbability = getRandom(0,100);
-			if(branchProbability > 99.5	){
+			if(branchProbability > 99.4 && branches.length <= maxBranches){
+				//create a new Branch
 				var colorString = 'rgb('+getRandomColor()+','+getRandomColor()+','+getRandomColor()+')';
-				branches.push(new Branch(b.x,b.y,b.rad,b.generation + 1, colorString));
-				console.log(' new branch!', branches.length, colorString);
+				var nb = new Branch({
+					x: b.x,
+					y: b.y,
+					rad: b.rad,
+					generation: b.generation+1,
+					color: colorString,
+					angle: b.angle + toRadians(getRandom(-30,30)) 
+				});
+				branches.push(nb);
+				//console.log(' new branch!', branches.length, colorString);
 			}
 		}
 	}
+	requestAnimationFrame(renderLoop);
 }
 
 
@@ -54,7 +82,8 @@ function drawSection(x,y,rad,color){
 
 
 init();
-setInterval(renderLoop, 10);
+//setInterval(renderLoop, growRate);
+renderLoop();
 
 
 
@@ -63,12 +92,13 @@ setInterval(renderLoop, 10);
 //_______________  CLASSES _________________________
 
 
-function Branch(startX, startY,startRad,generation,color){
-	this.x = startX;
-	this.y = startY;
-	this.rad = startRad;
-	this.generation = generation;
-	this.color = color;
+function Branch(configObj){
+	this.x = configObj.x;
+	this.y = configObj.y;
+	this.rad = configObj.rad;
+	this.generation = configObj.generation;
+	this.color = configObj.color;
+	this.angle = configObj.angle;
 	
 
 	////if( startRadius >= '.3') drawBranch(xPos,yPos,startRadius);
@@ -84,9 +114,13 @@ function getRandom (min, max) {
     return Math.random() * (max - min) + min;
 }
 function getRandomColor(){
-	return Math.floor(getRandom(0,100));
+	return Math.floor(getRandom(0,230));
 }
 
-
-
+function toRadians(degrees){
+	return degrees * (Math.PI/180);
+}
+function toDegreees(radians){
+	return radians * (180/Math.PI);
+}
 
