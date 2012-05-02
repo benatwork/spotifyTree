@@ -4,8 +4,14 @@
 
 
 //_____________ global configs _______________
-var maxBranches = 150;
-var growRate = 10;
+var maxBranches = 200;
+var growRate = 5;
+var roughness = 0;
+var startRadius = 10
+var renderCircles = true;
+var renderCircleFills = true;
+var renderLines = false;
+
 
 
 
@@ -13,6 +19,7 @@ var growRate = 10;
 var canvas = document.getElementById('treeCanvas');
 var ctx = canvas.getContext('2d');
 var branches = [];
+var completedCount = 0;
 
 var angleOffset = toRadians(50);
 
@@ -21,8 +28,8 @@ var angleOffset = toRadians(50);
 function init(){
 	var trunk = new Branch({
 		x: 400,
-		y: 400,
-		rad: 50,
+		y: 800,
+		rad: startRadius,
 		generation: 1,
 		color: 'rgb(0,0,0)',
 		angle: toRadians(90)
@@ -32,19 +39,26 @@ function init(){
 
 
 function renderLoop(){
-
+	
 	for (var i in branches){
 		var b = branches[i];
-		if(b.rad > '.5'){
-			drawSection(b.x, b.y, b.rad,b.color);
-		
-			b.x += getRandom(-b.generation,b.generation)+Math.cos(b.angle);
-			b.y -= getRandom(-b.generation,b.generation)+ Math.sin(b.angle)//getRandom(0,2)
-			b.angle += 5;
-			b.rad *= getRandom(994,998)/1000;
+		if(b.rad > .3){
+			if(renderCircles) drawSection(b.x, b.y, b.rad,b.color);
+			var previousPos = {x:b.x,y:b.y};
+
+			b.x -= Math.cos(b.angle)+getRandom(-roughness,roughness);
+			b.y -= b.rad+Math.sin(b.angle)+getRandom(-roughness,roughness);//getRandom(0,2)
+			if(renderLines)drawLine(b.x, b.y, previousPos.x, previousPos.y);
+
+			if(b.x > 400) {
+				b.angle -= toRadians(getRandom(-30,30));
+			} else {
+				b.angle += toRadians(getRandom(-30,30));
+			}
+			b.rad *= getRandom(970,998)/1000;
 
 			var branchProbability = getRandom(0,100);
-			if(branchProbability > 99.4 && branches.length <= maxBranches){
+			if(branchProbability > 98 && branches.length <= maxBranches){
 				//create a new Branch
 				var colorString = 'rgb('+getRandomColor()+','+getRandomColor()+','+getRandomColor()+')';
 				var nb = new Branch({
@@ -58,6 +72,13 @@ function renderLoop(){
 				branches.push(nb);
 				//console.log(' new branch!', branches.length, colorString);
 			}
+
+		} else if (!b.completed) {
+			b.completed = true;
+			var budSize = getRandom(3,10)
+			drawSection(b.x,b.y,budSize,b.color)
+			//drawSection(b.x,b.y,budSize-2,'#000');
+
 		}
 	}
 	requestAnimationFrame(renderLoop);
@@ -75,10 +96,17 @@ function drawSection(x,y,rad,color){
 	ctx.arc(x, y, rad, 0, Math.PI*2, false);
 	ctx.stroke();
 	ctx.closePath();
-	ctx.fill();
+	if(renderCircleFills)ctx.fill();
 	ctx.restore();
 }
+function drawLine(newX,newY,oldX,oldY){
+	ctx.beginPath();
+	ctx.moveTo(oldX,oldY);
+	ctx.lineTo(newX,newY);
+	ctx.closePath()
+	ctx.stroke();
 
+}
 
 
 
@@ -100,6 +128,7 @@ function Branch(configObj){
 	this.generation = configObj.generation;
 	this.color = configObj.color;
 	this.angle = configObj.angle;
+	this.completed = false;
 	
 
 	////if( startRadius >= '.3') drawBranch(xPos,yPos,startRadius);

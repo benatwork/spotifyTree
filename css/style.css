@@ -64,9 +64,30 @@ td { vertical-align: top; }
 
 .chromeframe { margin: 0.2em 0; background: #ccc; color: black; padding: 0.2em 0; }
 
-
-
-
+body{
+  background-color:#000033;
+}
+#main{
+  margin:auto;
+  padding:0;
+  text-align:center;
+}
+#treeCanvas{
+  margin:auto;
+  background: #cdebfe;
+  /* for Safari 5.03+ and Chrome 7+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #cdebfe), color-stop(1, #7bbae2));
+  /* for Firefox 3.6+ */
+  background-image: -moz-linear-gradient(top,  #cdebfe 0%, #7bbae2 100%);
+  /* for Opera 11.1+ */
+  background-image: -o-linear-gradient(top,  #cdebfe 0%, #7bbae2 100%);
+  /* for IE */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cdebfe', endColorstr='#7bbae2');
+  /* failsafe; use conditional include */
+  background-repeat: repeat-x;
+  border-radius:45px;
+  border: 1px solid #111;
+}
 
 
 
