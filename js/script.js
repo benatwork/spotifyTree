@@ -21,7 +21,7 @@ var angleOffset = toRadians(50);
 function init(){
 	var trunk = new Branch({
 		x: 400,
-		y: 800,
+		y: 400,
 		rad: 50,
 		generation: 1,
 		color: 'rgb(0,0,0)',
@@ -35,11 +35,12 @@ function renderLoop(){
 
 	for (var i in branches){
 		var b = branches[i];
-		if(b.rad > '.3'){
+		if(b.rad > '.5'){
 			drawSection(b.x, b.y, b.rad,b.color);
 		
 			b.x += getRandom(-b.generation,b.generation)+Math.cos(b.angle);
 			b.y -= getRandom(-b.generation,b.generation)+ Math.sin(b.angle)//getRandom(0,2)
+			b.angle += 5;
 			b.rad *= getRandom(994,998)/1000;
 
 			var branchProbability = getRandom(0,100);
